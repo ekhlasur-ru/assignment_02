@@ -1,26 +1,26 @@
 import express, { Request, Response } from "express";
-import configENV from "./config";
 import initDB from "./config/db";
 import logger from "./middleware/logger";
+import cookieParser from "cookie-parser";
 
 import { authRoutes } from "./modules/auth/auth.routes";
-
+import { userRoutes } from "./modules/users/user.routes";
+import { vehicleRoutes } from "./modules/vehicles/vehicles.routes";
+import { bookingsRoutes } from "./modules/bookings/bookings.routes";
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
+
 initDB();
 
 app.get("/", logger, (req: Request, res: Response) => {
   res.send("Hello Next Level Developers!");
 });
 
-//users CRUD
-// app.use("/users", userRoutes);
-
-//TODO CRUD
-// app.use("/todos", todoRoutes);
-
-//auth routes
 app.use("/auth", authRoutes);
+app.use("/api/v1", userRoutes);
+app.use("/api/v1", vehicleRoutes);
+app.use("/api/v1", bookingsRoutes);
 
 app.use((req, res) => {
   res.status(404).json({

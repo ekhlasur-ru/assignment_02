@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 
 const logger = (req: Request, res: Response, next: NextFunction) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}\n`);
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
+  next(); // MUST call next()!
 };
-
 export default logger;
