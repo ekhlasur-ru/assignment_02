@@ -18,9 +18,9 @@ const updateUserId = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
 
-    const data = await userServices.updateUserAdmin(id, req.body);
+    const result = await userServices.updateUserAdmin(id, req.body);
 
-    if (!data) {
+    if (!result) {
       return res.status(404).json({
         success: false,
         message: "User not found",
@@ -30,7 +30,7 @@ const updateUserId = async (req: Request, res: Response) => {
     return res.status(200).json({
       success: true,
       message: "User updated successfully",
-      data,
+      data: result,
     });
   } catch (err: any) {
     return res.status(500).json({
@@ -43,9 +43,9 @@ const updateUserInfo = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
 
-    const data = await userServices.updateUser(id, req.body);
+    const result = await userServices.updateUser(id, req.body);
 
-    if (!data) {
+    if (!result) {
       return res.status(404).json({
         success: false,
         message: "User not found",
@@ -55,7 +55,7 @@ const updateUserInfo = async (req: Request, res: Response) => {
     return res.status(200).json({
       success: true,
       message: "User updated successfully",
-      data,
+      data: result,
     });
   } catch (err: any) {
     return res.status(500).json({

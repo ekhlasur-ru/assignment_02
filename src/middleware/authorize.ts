@@ -13,9 +13,8 @@ const auth = (...roles: string[]) => {
         token,
         configENV.jwtSecret as string
       ) as JwtPayload;
-      req.user = decoded //as JwtPayload;
+      req.user = decoded;
 
-      //["admin"]
       if (roles.length && !roles.includes(decoded.role as string)) {
         return res.status(500).json({
           error: "unauthorized Role!!!",

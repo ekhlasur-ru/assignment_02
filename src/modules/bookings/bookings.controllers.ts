@@ -37,12 +37,12 @@ const getAllBookings = async (req: Request, res: Response) => {
 
 const updateBookings = async (req: Request, res: Response) => {
   try {
-    const data = await bookingServices.updatebookingsID(
-      req.params.bookingId as string,
+    const result = await bookingServices.updatebookingsID(
+      req.params.Id as string,
       req.body
     );
 
-    if (!data) {
+    if (!result) {
       return res.status(404).json({
         success: false,
         message: "Vehicle not found",
@@ -52,7 +52,7 @@ const updateBookings = async (req: Request, res: Response) => {
     res.status(200).json({
       success: true,
       message: "Vehicle updated successfully",
-      data,
+      data: result,
     });
   } catch (err: any) {
     res.status(500).json({ success: false, message: err.message });

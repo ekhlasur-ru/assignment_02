@@ -21,42 +21,6 @@ const signup = async (req: Request, res: Response) => {
   }
 };
 
-// const signin = async (req: Request, res: Response) => {
-//   const { email, password } = req.body;
-
-//   try {
-//     const user = await authServices.loginUser(email, password);
-
-//     if (!user) {
-//       return res.status(401).json({
-//         success: false,
-//         message: "Invalid email or password",
-//       });
-//     }
-
-//     const { name, role } = user;
-
-//     const token = jwt.sign(
-//       { name, email, role },
-//       configENV.jwtSecret as string,
-//       { expiresIn: "1h" }
-//     );
-
-//     res.setHeader("Authorization", token);
-//     return res.status(200).json({
-//       success: true,
-//       message: "Login successful",
-//       data: user,
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     return res.status(500).json({
-//       success: false,
-//       message: "Login failed",
-//     });
-//   }
-// };
-
 const signin = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
@@ -76,23 +40,9 @@ const signin = async (req: Request, res: Response) => {
   }
 };
 
-const logout = (req: Request, res: Response) => {
-  res.setHeader("Authorization", "");
 
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: false,
-    sameSite: "strict",
-  });
-
-  res.status(200).json({
-    success: true,
-    message: "Logged out successfully",
-  });
-};
 
 export const authControllers = {
   signup,
   signin,
-  logout,
 };

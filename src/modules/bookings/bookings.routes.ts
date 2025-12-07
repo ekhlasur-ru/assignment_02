@@ -7,19 +7,19 @@ const router = express.Router();
 router.post(
   "/bookings",
   logger,
-  auth("admin", "user"),
+  auth("admin", "customer"),
   bookingsControllers.createBooking
 );
 router.get(
   "/bookings",
   logger,
-  auth("admin", "user"),
+  auth("admin", "customer"),
   bookingsControllers.getAllBookings
 );
 router.put(
   "/bookings/:bookingId",
   logger,
-  auth("admin", "user"),
+  auth("admin", "customer"),
   bookingsControllers.updateBookings
 );
 
