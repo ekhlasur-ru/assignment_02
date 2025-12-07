@@ -10,15 +10,8 @@ interface CreateBookingPayload {
 const createBooking = async (payload: CreateBookingPayload) => {
   const { customer_id, vehicle_id, rent_start_date, rent_end_date } = payload;
 
-  const start = new Date(rent_start_date);
-  const end = new Date(rent_end_date);
-
-  if (end <= start) {
-    throw new Error("rent_end_date must be after rent_start_date");
-  }
-
   const vehicleResult = await pool.query(
-    `SELECT id, daily_rent_price, availability_status 
+    `SELECT id, vehicle_name, daily_rent_price, availability_status 
      FROM vehicles WHERE id = $1`,
     [vehicle_id]
   );
@@ -33,6 +26,13 @@ const createBooking = async (payload: CreateBookingPayload) => {
     throw new Error("Vehicle is not available for booking");
   }
 
+  //TODO calculation total price
+  const start = new Date(rent_start_date);
+  const end = new Date(rent_end_date);
+
+  if (end <= start) {
+    throw new Error("rent_end_date must be after rent_start_date");
+  }
   const milliseconds = end.getTime() - start.getTime();
   const days = Math.ceil(milliseconds / (1000 * 60 * 60 * 24));
 
@@ -40,7 +40,7 @@ const createBooking = async (payload: CreateBookingPayload) => {
     throw new Error("Invalid booking duration");
   }
 
-  const total_price = Number(vehicle.daily_rent_price) * days;
+  const total_price = vehicle.daily_rent_price * days;
 
   const bookingResult = await pool.query(
     `INSERT INTO bookings
@@ -48,13 +48,19 @@ const createBooking = async (payload: CreateBookingPayload) => {
      VALUES ($1, $2, $3, $4, $5, 'active') RETURNING *`,
     [customer_id, vehicle_id, rent_start_date, rent_end_date, total_price]
   );
-
+  const booking = bookingResult.rows[0];
   await pool.query(
     `UPDATE vehicles SET availability_status = 'booked' WHERE id = $1`,
     [vehicle_id]
   );
 
-  return bookingResult.rows[0];
+  return {
+    ...booking,
+    vehicle: {
+      vehicle_name: vehicle.vehicle_name,
+      daily_rent_price: vehicle.daily_rent_price,
+    },
+  };
 };
 
 const getbookings = async () => {
