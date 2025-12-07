@@ -5,8 +5,8 @@ import logger from "../../middleware/logger";
 
 const router = express.Router();
 
-router.post("/bookings", logger, bookingsControllers.createNewBooking);
-router.get("/bookings", logger, bookingsControllers.getBookings);
-router.put("/bookings/:bookingId", logger, bookingsControllers.updateBooking);
+router.post("/bookings", logger, bookingsControllers.createBooking);
+router.get("/bookings", logger, bookingsControllers.getAllBookings);
+// router.put("/bookings/:bookingId", logger, bookingsControllers.updateBookings);
 
 export const bookingsRoutes = router;

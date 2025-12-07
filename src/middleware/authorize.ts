@@ -1,11 +1,36 @@
-export const AuthorizeRoles =
-  (...roles: string[]) =>
-  (req: any, res: Response, next: Function) => {
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({
+import { NextFunction, Request, Response } from "express";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import configENV from "../config/index";
+
+const auth = (...roles: string[]) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const token = req.headers.authorization;
+      if (!token) {
+        return res.status(500).json({ message: "You are not allowed!!" });
+      }
+      const decoded = jwt.verify(
+        token,
+        configENV.jwtSecret as string
+      ) as JwtPayload;
+      console.log({ decoded });
+      req.user = decoded //as JwtPayload;
+
+      //["admin"]
+      if (roles.length && !roles.includes(decoded.role as string)) {
+        return res.status(500).json({
+          error: "unauthorized Role!!!",
+        });
+      }
+
+      next();
+    } catch (err: any) {
+      res.status(500).json({
         success: false,
-        message: "Access denied: Admin only",
+        message: err.message,
       });
     }
-    next();
   };
+};
+
+export default auth;

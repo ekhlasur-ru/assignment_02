@@ -14,7 +14,7 @@ const initDB = async () => {
         email VARCHAR(150) UNIQUE NOT NULL,
         password VARCHAR(200) NOT NULL CHECK (LENGTH(password) >= 6),
         phone VARCHAR(20) NOT NULL,
-        role VARCHAR(20) NOT NULL CHECK (role IN ('admin', 'customer'))
+        role VARCHAR(50) NOT NULL
         )
         `);
 
@@ -37,7 +37,7 @@ const initDB = async () => {
             rent_start_date DATE NOT NULL,
             rent_end_date DATE NOT NULL,
             total_price NUMERIC(10,2) NOT NULL CHECK (total_price > 0),
-            status VARCHAR(20) NOT NULL CHECK (status IN ('active', 'cancelled', 'returned')),
+            status VARCHAR(20) NOT NULL ,
             CHECK (rent_end_date > rent_start_date)
             )
             `);

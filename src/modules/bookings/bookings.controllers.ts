@@ -1,51 +1,66 @@
 import { Request, Response } from "express";
-import { bookingsServices } from "./bookings.service";
+import { bookingServices } from "./bookings.service";
 
-interface BookingParams {
-  bookingId: string;
-}
-
-const createNewBooking = async (req: Request, res: Response) => {
+const createBooking = async (req: Request, res: Response) => {
   try {
-    const user_id = req.user.id;
-    const payload = { ...req.body, customer_id: user_id };
-    const data = await bookingsServices.createbookings(payload);
-    res.status(201).json({ success: true, message: "Booking created", data });
-  } catch (err: any) {
-    res.status(400).json({ success: false, message: err.message });
+    const result = await bookingServices.createBooking(req.body);
+
+    res.status(201).json({
+      success: true,
+      message: "Booking created successfully",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(400).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
-const getBookings = async (req: Request, res: Response) => {
+const getAllBookings = async (req: Request, res: Response) => {
   try {
-    const user_id = req.user.id;
-    const role = req.user.role;
-    const data = await bookingsServices.getbookings(user_id, role);
-    res.status(200).json({ success: true, data });
-  } catch (err: any) {
-    res.status(500).json({ success: false, message: err.message });
+    const result = await bookingServices.getbookings();
+
+    res.json({
+      success: true,
+      message: "Bookings fetched successfully",
+      data: result,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
-const updateBooking = async (req: Request<BookingParams>, res: Response) => {
+const updateBookingStatus = async (req: Request, res: Response) => {
   try {
-    const bookingId = req.params.bookingId;
-    const role = req.user.role;
-    const action = req.body.action as "cancel" | "return";
+    const { id } = req.params;
+    const { status } = req.body;
 
-    const result = await bookingsServices.updatebookingsID(
-      bookingId,
-      role,
-      action
-    );
-    res.status(200).json({ success: true, message: result.message });
-  } catch (err: any) {
-    res.status(400).json({ success: false, message: err.message });
+    if (!["active", "cancelled", "returned"].includes(status)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid status" });
+    }
+
+    const result = await bookingServices.updatebookingsID(Number(id), status);
+
+    let message = "Booking status updated";
+    if (status === "returned")
+      message = "Booking marked as returned. Vehicle is now available";
+    if (status === "cancelled")
+      message = "Booking cancelled. Vehicle is now available";
+
+    res.status(200).json({ success: true, message, data: result });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
   }
 };
-
 export const bookingsControllers = {
-  createNewBooking,
-  getBookings,
-  updateBooking,
+  createBooking,
+  getAllBookings,
+  // updateBookings,
 };
