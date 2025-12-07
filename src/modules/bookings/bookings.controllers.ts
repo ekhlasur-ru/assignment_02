@@ -35,32 +35,31 @@ const getAllBookings = async (req: Request, res: Response) => {
   }
 };
 
-const updateBookingStatus = async (req: Request, res: Response) => {
+const updateBookings = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
-    const { status } = req.body;
+    const data = await bookingServices.updatebookingsID(
+      req.params.bookingId as string,
+      req.body
+    );
 
-    if (!["active", "cancelled", "returned"].includes(status)) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid status" });
+    if (!data) {
+      return res.status(404).json({
+        success: false,
+        message: "Vehicle not found",
+      });
     }
 
-    const result = await bookingServices.updatebookingsID(Number(id), status);
-
-    let message = "Booking status updated";
-    if (status === "returned")
-      message = "Booking marked as returned. Vehicle is now available";
-    if (status === "cancelled")
-      message = "Booking cancelled. Vehicle is now available";
-
-    res.status(200).json({ success: true, message, data: result });
-  } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(200).json({
+      success: true,
+      message: "Vehicle updated successfully",
+      data,
+    });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 export const bookingsControllers = {
   createBooking,
   getAllBookings,
-  // updateBookings,
+  updateBookings,
 };

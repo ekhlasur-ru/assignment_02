@@ -1,97 +1,95 @@
-# 01. What are some differences between interfaces and types in TypeScript?
+# Vehicle Rental System
 
-টাইপস্ক্রিপ্টে ইন্টারফেস (Interface) এবং টাইপ (Type) উভয়ই অবজেক্টের গঠন সংজ্ঞায়িত করতে ব্যবহৃত হয়, কিন্ত এদের মধ্যে প্রধান পার্থক্য হলো যে ইন্টারফেসের সংজ্ঞা একাধিকবার করা যায় এবং এটি এক্সটেন্ড (extends) করা যায়, যা টাইপের(Type) ক্ষেত্রে সম্ভব নয়।
+A simple backend API for managing vehicle rentals with authentication, vehicles, users, and bookings.
 
-## Interface
+## 🔗 Overview
 
-- মূলত অবজেক্টের গঠন সংজ্ঞায়িত করতে ব্যবহৃত হয়।
-- দুটি একই নামের ইন্টারফেস স্বয়ংক্রিয়ভাবে মার্জ করা যায়।
-- extends কীওয়ার্ড ব্যবহার করে অন্য ইন্টারফেস থেকে বৈশিষ্ট্য গ্রহণ করতে পারে।
-- ক্লাস বা অবজেক্টের জন্য একটি কন্ট্রাক্ট (contract) সংজ্ঞায়িত করতে আদর্শ।
-- সাধারণত কম্পাইল করতে দ্রুত হয়।
+This system allows customers and admins to manage vehicle rentals. It includes user signup/login, vehicle management, booking creation, and role-based access control. also following moduler patern.
 
-## উদাহারণ:
+## 🔗 Tech Stack (Tecnology)
 
-```ts
-interface Student {
-  name: string;
-  age: number;
-}
-interface Access extends Student {
-  isEnrolled: boolean;
-  courses: string[];
-}
-const student1: Access = {
-  name: "Ekhlasur Rahman",
-  age: 26,
-  isEnrolled: true,
-  courses: ["Math", "Physics", "Chemistry"],
-};
-```
+- Node.js + TypeScript
+- Express.js
+- PostgreSQL (pg)
+- Database Store NEON_DB
+- JWT Authentication
+- bcryptjs (password hashing)
 
-## Type
+## 🔗 Roles
 
-- যেকোনো টাইপ (যেমন অবজেক্ট, ইউনিয়ন, প্রিন্টেটিভ ইত্যাদি) সংজ্ঞায়িত করতে পারে।
-- একটি টাইপ একবার সংজ্ঞায়িত হলে, তাকে পুনরায় সংজ্ঞায়িত করা যায় না।
-- extends ব্যবহার করতে পারে না, তবে ইন্টারসেকশন অপারেটর (&) ব্যবহার করে টাইপকে একত্রিত করতে পারে।
-- ইউনিয়ন টাইপ, ম্যাপড টাইপ বা অন্যান্য জটিল টাইপ সংজ্ঞায়িত করার জন্য বেশি উপযোগী।
-- ইন্টারফেসের চেয়ে কম্পাইল হতে একটু বেশি সময় লাগতে পারে।
+- Admin: Full system access
 
-## উদাহারণ:
+- Customer: Can view vehicles & manage own bookings
 
-```ts
-type Student = {
-  name: string;
-  age: number;
-  isEnrolled: boolean;
-  courses: string[];
-};
-const student1: Student = {
-  name: "Ekhlasur Rahman",
-  age: 26,
-  isEnrolled: true,
-  courses: ["Math", "Physics", "Chemistry"],
-};
-```
+## 🔗 API Endpoints (Serial Order)
 
-# 02. Provide an example of using union and intersection types in TypeScript.
+### 1\. **User Authentication**
 
-## Union Type এর একটি উদাহারণ:
+#### 1.1 Signup
 
-```ts
-let userId: string | number;
+**POST** `/api/v1/auth/signup` — Register a new user (public)
 
-userId = 101;
-userId = "A102";
-```
+#### 1.2 Signin
 
-## intersection Type এর একটি উদাহারণ:
+**POST** `/api/v1/auth/signin` — Login and receive JWT token (public)
 
-```ts
-type Person = {
-  name: string;
-};
-type Employee = {
-  employeeId: number;
-};
+### 2\. **Vehicles API (Admin Only except GET)**
 
-type Staff = Person & Employee;
+#### 2.1 Create Vehicle
 
-const staff: Staff = {
-  name: "Ekhlasur Rahman",
-  employeeId: 18237128887,
-};
-```
+**POST** `/api/v1/vehicles` — Add a new vehicle (admin)
+
+#### 2.2 Get All Vehicles
+
+**GET** `/api/v1/vehicles` — View all vehicles (public)
+
+#### 2.3 Get Vehicle by ID
+
+**GET** `/api/v1/vehicles/:vehicleId` — View specific vehicle (public)
+
+#### 2.4 Update Vehicle
+
+**PUT** `/api/v1/vehicles/:vehicleId` — Edit vehicle details (admin)
+
+#### 2.5 Delete Vehicle
+
+**DELETE** `/api/v1/vehicles/:vehicleId` — Remove vehicle if no active bookings (admin)
+
+### 3\. **Users API**
+
+#### 3.1 Get All Users
+
+**GET** `/api/v1/users` — List all registered users (admin)
+
+#### 3.2 Update User
+
+**PUT** `/api/v1/users/:userId` — Admin updates any user OR user updates own profile
+
+#### 3.3 Delete User
+
+**DELETE** `/api/v1/users/:userId` — Delete user if no active bookings (admin)
+
+### 4\. **Bookings API**
+
+#### 4.1 Create Booking
+
+**POST** `/api/v1/bookings` — Create a new booking (customer & admin)
+
+#### 4.2 Get Bookings
+
+**GET** `/api/v1/bookings` — Admin gets all; customer gets own bookings
+
+#### 4.3 Update Booking
+
+**PUT** `/api/v1/bookings/:bookingId` — Customer cancels before start OR admin marks as returned
 
 ## 🔗 Repository Link
 
 You can access the GitHub repository here:  
-👉 [https://github.com/ekhlasur-ru/assignment_01](https://github.com/ekhlasur-ru/assignment_01)
+👉 [https://github.com/ekhlasur-ru/assignment_02](https://github.com/ekhlasur-ru/assignment_02)
 
 ---
 
-Submitted by: _Md. Ekhlasur Rahaman_ <br>
-Next Level Web development (_Batch-6_)<br>
-Assignment for: _TypeScript 1st Assignment_
-# assignment_02
-# assignment_02
+**Submitted by: Md. Ekhlasur Rahaman** <br>
+**Next Level Web development (Batch-6)**<br>
+**Assignment for: Vehicle Rental System**

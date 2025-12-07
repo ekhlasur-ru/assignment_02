@@ -64,25 +64,24 @@ const getbookings = async () => {
 
 const updatebookingsID = async (id: string, payload: any) => {
   const {
-    vehicle_name,
-    type,
-    registration_number,
-    daily_rent_price,
-    availability_status,
+    // customer_id,
+    // vehicle_id,
+    rent_start_date,
+    rent_end_date,
+    total_price,
+    status,
   } = payload;
 
   const result = await pool.query(
-    `UPDATE vehicles 
-     SET vehicle_name=$1, type=$2, registration_number=$3, daily_rent_price=$4, availability_status=$5
-     WHERE id=$6 RETURNING *`,
-    [
-      vehicle_name,
-      type,
-      registration_number,
-      daily_rent_price,
-      availability_status,
-      id,
-    ]
+    `UPDATE bookings 
+     SET
+         rent_start_date=$1, 
+         rent_end_date=$2, 
+         total_price=$3, 
+         status=$4
+     WHERE id=$5 
+     RETURNING *`,
+    [rent_start_date, rent_end_date, total_price, status, id]
   );
 
   return result.rows[0];
