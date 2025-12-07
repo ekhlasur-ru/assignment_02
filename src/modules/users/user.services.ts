@@ -5,11 +5,21 @@ const getAllUsers = async () => {
   return result.rows;
 };
 
+const updateUserAdmin = async (id: number, payload: any) => {
+  const { role } = payload;
+  const result = await pool.query(
+    `UPDATE users 
+     SET  role=$1 
+     WHERE id=$2 RETURNING *`,
+    [role, id]
+  );
+  return result.rows[0];
+};
 const updateUser = async (id: number, payload: any) => {
   const { name, email, phone, role } = payload;
   const result = await pool.query(
-    `UPDATE users 
-     SET name=$1, email=$2, phone=$3, role=$4 
+    `UPDATE users
+     SET name=$1, email=$2, phone=$3, role=$4
      WHERE id=$5 RETURNING *`,
     [name, email, phone, role, id]
   );
@@ -25,6 +35,7 @@ const deleteUser = async (id: number) => {
 
 export const userServices = {
   getAllUsers,
+  updateUserAdmin,
   updateUser,
   deleteUser,
 };

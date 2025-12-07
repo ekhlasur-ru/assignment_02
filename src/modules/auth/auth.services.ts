@@ -18,20 +18,16 @@ const createUser = async (payload: Record<string, unknown>) => {
 };
 
 const loginUser = async (email: string, password: string) => {
-  // console.log(email);
   const result = await pool.query(`SELECT * FROM users WHERE email=$1`, [
     email,
   ]);
-  // console.log(result);
   if (result.rows.length === 0) {
     return null;
   }
   const user = result.rows[0];
 
   const match = await bcrypt.compare(password, user.password);
-  // console.log(match, user);
   if (!match) {
-    // return false
     throw new Error("Password does not match");
   }
   const token = jwt.sign(
@@ -39,7 +35,6 @@ const loginUser = async (email: string, password: string) => {
     configENV.jwtSecret as string,
     { expiresIn: "7d" }
   );
-  console.log({ token });
   user.token = token;
 
   return { token, user };

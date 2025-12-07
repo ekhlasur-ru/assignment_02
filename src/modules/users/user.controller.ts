@@ -17,6 +17,32 @@ const getUser = async (req: Request, res: Response) => {
 const updateUserId = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
+
+    const data = await userServices.updateUserAdmin(id, req.body);
+
+    if (!data) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "User updated successfully",
+      data,
+    });
+  } catch (err: any) {
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+const updateUserInfo = async (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+
     const data = await userServices.updateUser(id, req.body);
 
     if (!data) {
@@ -26,13 +52,16 @@ const updateUserId = async (req: Request, res: Response) => {
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "User updated successfully",
       data,
     });
   } catch (err: any) {
-    res.status(500).json({ success: false, message: err.message });
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    });
   }
 };
 
@@ -60,5 +89,6 @@ const deleteUserId = async (req: Request, res: Response) => {
 export const userControllers = {
   getUser,
   updateUserId,
+  updateUserInfo,
   deleteUserId,
 };
