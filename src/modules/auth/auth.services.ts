@@ -35,7 +35,7 @@ const loginUser = async (email: string, password: string) => {
     configENV.jwtSecret as string,
     { expiresIn: "7d" }
   );
-  user.token = token;
+  // user.token = token;
 
   return { token, user };
 };
