@@ -14,7 +14,7 @@ app.use(cookieParser());
 initDB();
 
 app.get("/", logger, (req: Request, res: Response) => {
-  res.send("Hello Next Level Developers!");
+  res.send("Vehicle Rental System");
 });
 
 app.use("/auth", authRoutes);
