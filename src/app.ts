@@ -17,7 +17,7 @@ app.get("/", logger, (req: Request, res: Response) => {
   res.send("Vehicle Rental System");
 });
 
-app.use("/auth", authRoutes);
+app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1", userRoutes);
 app.use("/api/v1", vehicleRoutes);
 app.use("/api/v1", bookingsRoutes);
