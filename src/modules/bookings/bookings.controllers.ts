@@ -36,28 +36,38 @@ const getAllBookings = async (req: Request, res: Response) => {
 };
 
 const updateBookings = async (req: Request, res: Response) => {
+  const bookingId = req.params.id;
+
   try {
     const result = await bookingServices.updatebookingsID(
-      req.params.Id as string,
+      bookingId as string,
       req.body
     );
 
     if (!result) {
       return res.status(404).json({
         success: false,
-        message: "Vehicle not found",
+        message: "Booking ID not found",
       });
     }
+    const message =
+      req.body.status === "returned"
+        ? "Booking marked as returned. Vehicle is now available"
+        : "Booking updated successfully";
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
-      message: "Vehicle updated successfully",
-      data: result,
+      message,
+      data: updateBookings,
     });
-  } catch (err: any) {
-    res.status(500).json({ success: false, message: err.message });
+  } catch (error: any) {
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Internal Server Error",
+    });
   }
 };
+
 export const bookingsControllers = {
   createBooking,
   getAllBookings,
