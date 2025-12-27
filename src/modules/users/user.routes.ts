@@ -6,8 +6,14 @@ import auth from "../../middleware/authorize";
 const router = express.Router();
 
 router.get("/users", logger, auth("admin"), userControllers.getUser);
-router.put("/users/:id", logger, auth("admin"), userControllers.updateUserId);
-router.put("/users/:id", logger, auth("customer"), userControllers.updateUserId);
+router.put(
+  "/users/:userId",
+  auth("customer", "admin"),
+  logger,
+  userControllers.updateUserId
+);
+
+
 router.delete(
   "/users/:id",
   logger,

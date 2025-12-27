@@ -5,65 +5,82 @@ const createBooking = async (req: Request, res: Response) => {
   try {
     const result = await bookingServices.createBooking(req.body);
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: "Booking created successfully",
       data: result,
     });
   } catch (error: any) {
-    res.status(400).json({
+    return res.status(400).json({
       success: false,
-      message: error.message,
+      message: "Booking creation failed",
+      errors: error.message,
     });
   }
 };
 
 const getAllBookings = async (req: Request, res: Response) => {
   try {
-    const result = await bookingServices.getbookings();
+    const { id, role } = req.user as { id: number; role: string };
 
-    res.json({
+    const result = await bookingServices.getBookings(id, role);
+
+    const customMessage =
+      role === "admin"
+        ? "Bookings retrieved successfully"
+        : "Your bookings retrieved successfully";
+    return res.status(200).json({
       success: true,
-      message: "Bookings fetched successfully",
+      message: customMessage,
       data: result,
     });
   } catch (error: any) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
-      message: error.message,
+      message: "Failed to retrieved  bookings",
+      errors: error.message,
     });
   }
 };
 
-const updateBookings = async (req: Request, res: Response) => {
-  const bookingId = req.params.id;
-
+const updateBooking = async (req: Request, res: Response) => {
   try {
-    const result = await bookingServices.updatebookingsID(
+    const user = req.user as { id: number; role: string };
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+        errors: "User authentication required",
+      });
+    }
+
+    const bookingId = req.params.bookingId;
+    const payload = req.body;
+    const result = await bookingServices.updateBookings(
       bookingId as string,
-      req.body
+      user.role,
+      payload,
+      user.id
     );
 
     if (!result) {
       return res.status(404).json({
         success: false,
-        message: "Booking ID not found",
+        message: "Booking not found or access denied",
+        errors: "Invalid booking ID or insufficient permission",
       });
     }
-    const message =
-      req.body.status === "returned"
-        ? "Booking marked as returned. Vehicle is now available"
-        : "Booking updated successfully";
-
     return res.status(200).json({
       success: true,
-      message,
-      data: updateBookings,
+      message: "Bookings updated successfully",
+      data: result,
     });
   } catch (error: any) {
     return res.status(500).json({
       success: false,
-      message: error.message || "Internal Server Error",
+      message: "Failed to update booking",
+      errors: error.message,
     });
   }
 };
@@ -71,5 +88,5 @@ const updateBookings = async (req: Request, res: Response) => {
 export const bookingsControllers = {
   createBooking,
   getAllBookings,
-  updateBookings,
+  updateBooking,
 };

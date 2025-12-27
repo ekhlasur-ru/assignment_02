@@ -20,7 +20,7 @@ router.put(
   "/bookings/:bookingId",
   logger,
   auth("admin", "customer"),
-  bookingsControllers.updateBookings
+  bookingsControllers.updateBooking
 );
 
 export const bookingsRoutes = router;

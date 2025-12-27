@@ -1,28 +1,47 @@
 import { pool } from "../../config/db";
 
 const getAllUsers = async () => {
-  const result = await pool.query(`SELECT * FROM users`);
+  const result = await pool.query(
+    `SELECT id, name, email, phone, role FROM users ORDER BY id ASC`
+  );
   return result.rows;
 };
+const updateUser = async (id: string, role: string, payload: any) => {
+  let result;
 
-const updateUserAdmin = async (id: number, payload: any) => {
-  const { role } = payload;
-  const result = await pool.query(
-    `UPDATE users 
-     SET  role=$1 
-     WHERE id=$2 RETURNING *`,
-    [role, id]
-  );
-  return result.rows[0];
-};
-const updateUser = async (id: number, payload: any) => {
-  const { name, email, phone, role } = payload;
-  const result = await pool.query(
-    `UPDATE users
-     SET name=$1, email=$2, phone=$3, role=$4
-     WHERE id=$5 RETURNING *`,
-    [name, email, phone, role, id]
-  );
+  if (role === "admin") {
+    const { name, email, phone, role: newRole } = payload;
+
+    result = await pool.query(
+      `
+      UPDATE users
+      SET name  = COALESCE($1, name),
+          email = COALESCE($2, email),
+          phone = COALESCE($3, phone),
+          role  = COALESCE($4, role)
+      WHERE id = $5
+      RETURNING id, name, email, phone, role;
+      `,
+      [name, email, phone, newRole, id]
+    );
+  } else if (role === "customer") {
+    const { name, email, phone } = payload;
+
+    result = await pool.query(
+      `
+      UPDATE users
+      SET name  = COALESCE($1, name),
+          email = COALESCE($2, email),
+          phone = COALESCE($3, phone)
+      WHERE id = $4
+      RETURNING id, name, email, phone ,role;
+      `,
+      [name, email, phone, id]
+    );
+  } else {
+    throw new Error("Unauthorized role");
+  }
+
   return result.rows[0];
 };
 
@@ -30,12 +49,11 @@ const deleteUser = async (id: number) => {
   const result = await pool.query(`DELETE FROM users WHERE id=$1 RETURNING *`, [
     id,
   ]);
-  return result.rows[0]; // return deleted user data
+  return result.rows[0];
 };
 
 export const userServices = {
   getAllUsers,
-  updateUserAdmin,
   updateUser,
   deleteUser,
 };

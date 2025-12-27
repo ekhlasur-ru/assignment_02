@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
 import { authServices } from "./auth.services";
-import jwt from "jsonwebtoken";
-import configENV from "../../config";
 
 const signup = async (req: Request, res: Response) => {
   try {
@@ -26,6 +24,13 @@ const signin = async (req: Request, res: Response) => {
 
   try {
     const result = await authServices.loginUser(email, password);
+    if (!result) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
     res.status(200).json({
       success: true,
       message: "Login successful",
@@ -39,8 +44,6 @@ const signin = async (req: Request, res: Response) => {
     });
   }
 };
-
-
 
 export const authControllers = {
   signup,
