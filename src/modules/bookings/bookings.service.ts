@@ -83,7 +83,7 @@ const getBookings = async (userId: number, role: string) => {
       FROM bookings b
       JOIN users u ON b.customer_id = u.id
       JOIN vehicles v ON b.vehicle_id = v.id
-      ORDER BY b.id DESC
+      ORDER BY b.id ASC
     `);
 
     return result.rows.map((row) => ({
@@ -116,7 +116,7 @@ const getBookings = async (userId: number, role: string) => {
       FROM bookings b
       JOIN vehicles v ON b.vehicle_id = v.id
       WHERE b.customer_id = $1
-      ORDER BY b.id DESC
+      ORDER BY b.id ASC
       `,
       [userId]
     );
