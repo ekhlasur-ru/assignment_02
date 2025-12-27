@@ -46,21 +46,20 @@ const getAllBookings = async (req: Request, res: Response) => {
 const updateBooking = async (req: Request, res: Response) => {
   try {
     const user = req.user as { id: number; role: string };
+    const bookingId = req.params.bookingId;
+    const status = req.body.status;
 
     if (!user) {
       return res.status(401).json({
         success: false,
         message: "Unauthorized",
-        errors: "User authentication required",
       });
     }
 
-    const bookingId = req.params.bookingId;
-    const payload = req.body;
     const result = await bookingServices.updateBookings(
       bookingId as string,
-      user.role,
-      payload,
+      user.role as "admin" | "customer" | "system",
+      status,
       user.id
     );
 
@@ -68,23 +67,42 @@ const updateBooking = async (req: Request, res: Response) => {
       return res.status(404).json({
         success: false,
         message: "Booking not found or access denied",
-        errors: "Invalid booking ID or insufficient permission",
       });
     }
-    return res.status(200).json({
-      success: true,
-      message: "Bookings updated successfully",
-      data: result,
+
+    if (user.role === "customer" && status === "cancelled") {
+      return res.status(200).json({
+        success: true,
+        message: "Booking cancelled successfully",
+        data: result,
+      });
+    }
+
+    if (user.role === "admin" && status === "returned") {
+      return res.status(200).json({
+        success: true,
+        message: "Booking marked as returned. Vehicle is now available",
+        data: {
+          ...result,
+          vehicle: {
+            availability_status: "available",
+          },
+        },
+      });
+    }
+
+    return res.status(400).json({
+      success: false,
+      message: "Invalid update request",
     });
   } catch (error: any) {
-    return res.status(500).json({
+    return res.status(400).json({
       success: false,
       message: "Failed to update booking",
-      errors: error.message,
+      error: error.message,
     });
   }
 };
-
 export const bookingsControllers = {
   createBooking,
   getAllBookings,
