@@ -25,7 +25,7 @@ const createVehicle = async (payload: any) => {
 };
 
 const getVehicles = async () => {
-  const result = await pool.query(`SELECT * FROM vehicles `);
+  const result = await pool.query(`SELECT * FROM vehicles ORDER BY id ASC`);
   return result.rows;
 };
 
