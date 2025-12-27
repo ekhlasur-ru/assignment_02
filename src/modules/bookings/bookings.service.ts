@@ -193,9 +193,6 @@ const updateBookings = async (
     return result.rows[0];
   }
 
-  /* =========================
-     SYSTEM: Auto Returned
-  ========================== */
   if (role === "system") {
     if (today > endDate && booking.status !== "returned") {
       const result = await pool.query(
