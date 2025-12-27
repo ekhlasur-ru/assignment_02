@@ -14,7 +14,7 @@ app.use(cookieParser());
 initDB();
 
 app.get("/", logger, (req: Request, res: Response) => {
-  res.send("Vehicle Rental System");
+  res.send("Vehicle Rental System develoved by EKHLASUR RAHMAN");
 });
 
 app.use("/api/v1/auth", authRoutes);
