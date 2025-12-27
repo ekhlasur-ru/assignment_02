@@ -26,7 +26,6 @@ const createBooking = async (payload: CreateBookingPayload) => {
     throw new Error("Vehicle is not available for booking");
   }
 
-  //TODO calculation total price
   const start = new Date(rent_start_date);
   const end = new Date(rent_end_date);
 
@@ -49,12 +48,6 @@ const createBooking = async (payload: CreateBookingPayload) => {
     [customer_id, vehicle_id, rent_start_date, rent_end_date, total_price]
   );
   const booking = bookingResult.rows[0];
-
-  // const customerResult = await pool.query(
-  //   `SELECT name AS customer_name, email AS customer_email FROM users WHERE id = $1`,
-  //   [customer_id]
-  // );
-  // const customer = customerResult.rows[0];
 
   await pool.query(
     `UPDATE vehicles SET availability_status = 'booked' WHERE id = $1`,
@@ -80,9 +73,9 @@ const getBookings = async (userId: number, role: string) => {
         v.vehicle_name,
         v.registration_number,
         v.daily_rent_price
-      FROM bookings b
-      JOIN users u ON b.customer_id = u.id
-      JOIN vehicles v ON b.vehicle_id = v.id
+      FROM bookings as b
+      JOIN users as u ON b.customer_id = u.id
+      JOIN vehicles as v ON b.vehicle_id = v.id
       ORDER BY b.id ASC
     `);
 
@@ -113,8 +106,8 @@ const getBookings = async (userId: number, role: string) => {
         v.vehicle_name,
         v.registration_number,
         v.type
-      FROM bookings b
-      JOIN vehicles v ON b.vehicle_id = v.id
+      FROM bookings as b
+      JOIN vehicles as v ON b.vehicle_id = v.id
       WHERE b.customer_id = $1
       ORDER BY b.id ASC
       `,
