@@ -1,15 +1,18 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import configENV from "../config/index";
+import { error } from "console";
 
 const auth = (...roles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       const authHeader = req.headers.authorization;
       if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        return res
-          .status(401)
-          .json({ message: "Can't provided Bearer with token" });
+        return res.status(401).json({
+          success: false,
+          message: "Can't provided Bearer with token",
+          errors: "token invalid",
+        });
       }
       const token = authHeader.split(" ")[1];
       if (!token) {
@@ -23,7 +26,9 @@ const auth = (...roles: string[]) => {
 
       if (roles.length && !roles.includes(decoded.role as string)) {
         return res.status(403).json({
-          error: "unauthorized Role!!!",
+          success: false,
+          message: "unauthorized Role!!!",
+          errors: "token invalid",
         });
       }
 
@@ -31,7 +36,8 @@ const auth = (...roles: string[]) => {
     } catch (err: any) {
       res.status(500).json({
         success: false,
-        message: err.message,
+        message: "Authentication failed",
+        error: err.message,
       });
     }
   };

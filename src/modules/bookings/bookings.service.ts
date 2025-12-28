@@ -138,38 +138,49 @@ const updateBookings = async (
   status: "cancelled" | "returned",
   userId?: number
 ) => {
-  const bookingRes = await pool.query(`SELECT * FROM bookings WHERE id = $1`, [
-    bookingId,
-  ]);
+  const bookingRes = await pool.query(
+    `select * from bookings where id = $1`,
+    [bookingId]
+  );
+
+  if (bookingRes.rows.length === 0) return null;
 
   const booking = bookingRes.rows[0];
-  if (!booking) return null;
 
-  const today = new Date();
-  const startDate = new Date(booking.rent_start_date);
-  const endDate = new Date(booking.rent_end_date);
+  const today = new Date().setHours(0, 0, 0, 0);
+  const startDate = new Date(booking.rent_start_date).setHours(0, 0, 0, 0);
+  const endDate = new Date(booking.rent_end_date).setHours(0, 0, 0, 0);
 
   if (role === "customer") {
-    if (booking.customer_id !== userId) return null;
-    if (today >= startDate) throw new Error("Cannot cancel after start date");
-    if (status !== "cancelled") throw new Error("Invalid status");
+    if (booking.customer_id !== userId)
+      throw new Error("Unauthorized access");
 
-    const result = await pool.query(
-      `UPDATE bookings
-       SET status = 'cancelled'
-       WHERE id = $1
-       RETURNING *`,
+    if (today >= startDate)
+      throw new Error("Cannot cancel after rental start date");
+
+    if (status !== "cancelled")
+      throw new Error("Invalid status for customer");
+
+    const bookingUpdate = await pool.query(
+      `update bookings
+       set status = 'cancelled'
+       where id = $1
+       returning *`,
       [bookingId]
     );
 
-    await pool.query(
-      `UPDATE vehicles
-       SET availability_status = 'available'
-       WHERE id = $1`,
+    const vehicleUpdate = await pool.query(
+      `update vehicles
+       set availability_status = 'available'
+       where id = $1
+       returning availability_status`,
       [booking.vehicle_id]
     );
 
-    return result.rows[0];
+    return {
+      ...bookingUpdate.rows[0],
+      vehicle: vehicleUpdate.rows[0],
+    };
   }
 
   if (role === "admin") {
